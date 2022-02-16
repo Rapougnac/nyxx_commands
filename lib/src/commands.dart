@@ -660,7 +660,7 @@ class CommandsPlugin extends BasePlugin implements ICommandGroup<IContext> {
 
         return found;
       } else {
-        return child.getCommand(view) as ChatCommand;
+        return child.getCommand(view) as ChatCommand?;
       }
     }
 
