@@ -494,7 +494,7 @@ class ChatCommand
         dynamic rawArgument = context.rawArguments[kebabCaseName]!;
 
         if (isAssignableTo(rawArgument.runtimeType, parameter.type)) {
-          arguments.add(Future.value(rawArgument));
+          arguments.add(rawArgument);
           continue;
         }
 
