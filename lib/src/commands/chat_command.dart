@@ -487,7 +487,7 @@ class ChatCommand
         String kebabCaseName = convertToKebabCase(parameter.name);
 
         if (!context.rawArguments.containsKey(kebabCaseName)) {
-          arguments.add(Future.value(parameter.defaultValue));
+          arguments.add(parameter.defaultValue);
           continue;
         }
 
