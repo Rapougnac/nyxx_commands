@@ -678,7 +678,6 @@ class ChatCommand
         if (_channelTypes != null && _channelTypes.isNotEmpty) {
           channelTypes = _channelTypes;
         } else {
-          // Needs support for news channels.
           if (mirror.type.reflectedType == IChannel) {
             // All channels are allowed
             channelTypes = null;
