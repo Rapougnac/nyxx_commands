@@ -73,6 +73,7 @@ export 'src/util/util.dart'
         Description,
         Name,
         UseConverter,
+        ChannelTypes,
         commandNameRegexp,
         convertToKebabCase,
         dmOr,
