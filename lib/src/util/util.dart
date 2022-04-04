@@ -241,3 +241,45 @@ String Function(IMessage) dmOr(String Function(IMessage) defaultPrefix) {
 /// For more information on naming restrictions, check the
 /// [Discord documentation](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming).
 final RegExp commandNameRegexp = RegExp(r'^[\w-]{1,32}$', unicode: true);
+
+/// An annotation used to specify the type of the channnels in slash commands.
+/// 
+/// For example:
+/// ```dart
+/// ChatCommand test = ChatCommand(
+///  'test',
+///   'A test command',
+///   (
+///   IChatContext context,
+///   @ChannelTypes([ChannelType.text]) IChannel foo,
+///   ) async {
+///     context.respond(MessageBuilder.content(foo.id.toString()));
+///   },
+/// );
+/// ```
+/// Or you can infer the type to allow specific channels without the needs of `@ChannelTypes` annotation:
+/// ```dart
+/// ChatCommand test = ChatCommand(
+/// 'test',
+/// 'A test command',
+/// (
+///   IChatContext context,
+///   IVoiceGuildChannel foo, // on `foo` option, the values will be all voice channels
+///   ) async {
+///     context.respond(MessageBuilder.content(foo.name));
+///   },
+/// );
+/// ```
+/// 
+/// [Discord documentation](https://discord.com/developers/docs/resources/channel#channel-object-channel-types)
+/// 
+/// See also: [ChannelType]
+class ChannelTypes {
+  /// The types of the channel to use.
+  final List<ChannelType> types;
+
+  /// Create a new [ChannelTypes].
+  ///
+  /// This is intended to be used as an `@ChannelTypes(...)` annotation, and has no functionality as a standalone class.
+  const ChannelTypes(this.types);
+}
