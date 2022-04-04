@@ -44,7 +44,8 @@ import '../util/view.dart';
 /// - [voiceGuildChannelConverter], which converts [IVoiceGuildChannel]s;
 /// - [stageVoiceChannelConverter], which converts [IStageVoiceGuildChannel]s;
 /// - [roleConverter], which converts [IRole]s;
-/// - [mentionableConverter], which converts [Mentionable]s.
+/// - [mentionableConverter], which converts [Mentionable]s;
+/// - [threadConverter], which converts [IThreadChannel]s;
 ///
 /// You can override these default implementations with your own by calling
 /// [CommandsPlugin.addConverter] with your own converter for one of the types mentioned above.
@@ -804,6 +805,105 @@ Future<dynamic> parse(
   }
 }
 
+const Converter<IChannel> channelConverter =
+    FallbackConverter([
+      CombineConverter<Snowflake, IChannel>(snowflakeConverter, snowflakeToChannel),
+    ]);
+
+FutureOr<T>? snowflakeToChannel<T extends IChannel>(Snowflake id, IChatContext context) {
+  final cached = context.client.channels[id] as T?;
+  if (cached != null) {
+    return cached;
+  }
+
+  return context.client.httpEndpoints.fetchChannel<T>(id);
+}
+
+/// A converter that converts input to an [IStageVoiceGuildChannel].
+///
+/// This will first attempt to parse the input as a [Snowflake] that will then be converted to an
+/// [IStageVoiceGuildChannel]. If this fails, the channel will be looked up by name in the current
+/// guild.
+///
+/// This converter has a Discord Slash Command argument type of [CommandOptionType.channel].
+const Converter<IThreadChannel> threadConverter = FallbackConverter(
+  [
+    CombineConverter<Snowflake, IThreadChannel>(
+        snowflakeConverter, snowflakeToThreadChannel),
+    Converter<IThreadChannel>(convertThreadChannel),
+  ],
+  type: CommandOptionType.channel,
+);
+
+Future<IThreadChannel?> snowflakeToThreadChannel(Snowflake id, IChatContext context) async {
+  if (context.guild != null) {
+      final c = context.guild!.channels.whereType<ITextGuildChannel>().length;
+      print(c);
+    for (final channel in context.guild!.channels) {
+      if (channel is ITextGuildChannel) {
+        final threads = await channel.fetchActiveThreads();
+        final thread = threads.threads.firstWhereSafe((t) => t.id == id);
+        if (thread != null) {
+          return thread;
+        }
+        final publicArchivedThreads =
+            await channel.fetchPublicArchivedThreads();
+        final publicArchivedThread =
+            publicArchivedThreads.threads.firstWhereSafe((t) => t.id == id);
+
+        if (publicArchivedThread != null) {
+          return publicArchivedThread;
+        }
+
+        final privateArchivedThreads =
+            await channel.fetchPrivateArchivedThreads();
+        final privateArchivedThread =
+            privateArchivedThreads.threads.firstWhereSafe((t) => t.id == id);
+
+        if (privateArchivedThread != null) {
+          return privateArchivedThread;
+        }
+
+        return null;
+      }
+      continue;
+    }
+  }
+  return null;
+}
+
+Future<IThreadChannel?> convertThreadChannel(StringView view, IChatContext context) async {
+    if (context.guild != null) {
+    String word = view.getQuotedWord();
+    Iterable<ITextGuildChannel> channels = context.guild!.channels.whereType<ITextGuildChannel>();
+
+    List<IThreadChannel> caseInsensitive = [];
+    List<IThreadChannel> partial = [];
+
+    for (final channel in channels) {
+      final threads = await channel.fetchActiveThreads();
+      for(final thread in threads.threads) {
+        if(thread.name.toLowerCase() == word.toLowerCase()) {
+          caseInsensitive.add(thread);
+        }
+
+        if(thread.name.toLowerCase().startsWith(word.toLowerCase())) {
+          partial.add(thread);
+        }
+      }
+    }
+
+    for (final list in [caseInsensitive, partial]) {
+      if (list.length == 1) {
+        return list.first;
+      }
+    }
+  }
+  return null;
+}
+
+
+
 /// Adds the default converters to an instance of [CommandsPlugin].
 ///
 /// This function is called automatically and you do not need to call it yourself.
@@ -824,5 +924,7 @@ void registerDefaultConverters(CommandsPlugin commands) {
     ..addConverter(stageVoiceChannelConverter)
     ..addConverter(roleConverter)
     ..addConverter(mentionableConverter)
-    ..addConverter(attachmentConverter);
+    ..addConverter(attachmentConverter)
+    ..addConverter(threadConverter);
+    // ..addConverter(channelConverter);
 }
