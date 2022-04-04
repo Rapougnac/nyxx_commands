@@ -835,42 +835,47 @@ const Converter<IThreadChannel> threadConverter = FallbackConverter(
   type: CommandOptionType.channel,
 );
 
+/// We need to cache threads, this is way too slow to do every time.
+/// Maybe attach threads to the channel?
+final cachedThreads = <Snowflake, IThreadChannel>{};
 Future<IThreadChannel?> snowflakeToThreadChannel(Snowflake id, IChatContext context) async {
   if (context.guild != null) {
-      final c = context.guild!.channels.whereType<ITextGuildChannel>().length;
-      print(c);
-    for (final channel in context.guild!.channels) {
-      if (channel is ITextGuildChannel) {
-        final threads = await channel.fetchActiveThreads();
-        final thread = threads.threads.firstWhereSafe((t) => t.id == id);
-        if (thread != null) {
-          return thread;
-        }
-        final publicArchivedThreads =
-            await channel.fetchPublicArchivedThreads();
-        final publicArchivedThread =
-            publicArchivedThreads.threads.firstWhereSafe((t) => t.id == id);
-
-        if (publicArchivedThread != null) {
-          return publicArchivedThread;
-        }
-
-        final privateArchivedThreads =
-            await channel.fetchPrivateArchivedThreads();
-        final privateArchivedThread =
-            privateArchivedThreads.threads.firstWhereSafe((t) => t.id == id);
-
-        if (privateArchivedThread != null) {
-          return privateArchivedThread;
-        }
-
-        return null;
+    if(cachedThreads[id] != null) {
+      return cachedThreads[id];
+    }
+    final channels = context.guild!.channels.whereType<ITextGuildChannel>();
+    var i = 0;
+    while (i < channels.length) {
+      final channel = channels.elementAt(i);
+      final thread = (await channel.fetchActiveThreads())
+          .threads
+          .firstWhereSafe((thread) => thread.id == id);
+      if (thread != null) {
+        cachedThreads[thread.id] = thread;
+        return thread;
       }
-      continue;
+      final pubicArchivedThread = (await channel.fetchPublicArchivedThreads())
+          .threads
+          .firstWhereSafe((thread) => thread.id == id);
+      if (pubicArchivedThread != null) {
+        cachedThreads[pubicArchivedThread.id] = pubicArchivedThread;
+        return pubicArchivedThread;
+      }
+      final privateArchivedThread =
+          (await channel.fetchPrivateArchivedThreads())
+              .threads
+              .firstWhereSafe((thread) => thread.id == id);
+      if (privateArchivedThread != null) {
+        cachedThreads[privateArchivedThread.id] = privateArchivedThread;
+        return privateArchivedThread;
+      }
+      i++;
     }
   }
   return null;
 }
+
+
 
 Future<IThreadChannel?> convertThreadChannel(StringView view, IChatContext context) async {
     if (context.guild != null) {
