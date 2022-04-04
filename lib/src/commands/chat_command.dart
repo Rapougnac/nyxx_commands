@@ -15,6 +15,7 @@
 import 'dart:async';
 import 'dart:mirrors';
 
+import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';
 
 import '../checks/checks.dart';
@@ -326,6 +327,7 @@ class ChatCommand
   final Map<String, Description> _mappedDescriptions = {};
   final Map<String, Choices> _mappedChoices = {};
   final Map<String, UseConverter> _mappedConverterOverrides = {};
+  final Map<String, ChannelTypes> _mappedChannelTypes = {};
 
   /// Create a new [ChatCommand].
   ///
@@ -481,6 +483,11 @@ class ChatCommand
         throw CommandRegistrationError(
             'Command callback parameters must not have more than one UseConverter annotation');
       }
+
+      if (parametrer.metadata.where((element) => element.reflectee is ChannelTypes).length > 1) {
+        throw CommandRegistrationError(
+          'Command callback parameters must not have more than one ChannelTypes annotation');
+      }
     }
 
     for (final argument in _arguments) {
@@ -532,6 +539,15 @@ class ChatCommand
 
       if (choices.isNotEmpty) {
         _mappedChoices[argumentName] = choices.first;
+      }
+
+      Iterable<ChannelTypes> channelTypes = argument.metadata
+          .where((element) => element.reflectee is ChannelTypes)
+          .map((channelTypesMirror) => channelTypesMirror.reflectee)
+          .cast<ChannelTypes>();
+
+      if (channelTypes.isNotEmpty) {
+        _mappedChannelTypes[argumentName] = channelTypes.first;
       }
 
       Iterable<UseConverter> converterOverrides = argument.metadata
@@ -657,12 +673,61 @@ class ChatCommand
 
         choices ??= argumentConverter?.choices;
 
+        final _channelTypes = _mappedChannelTypes[name]?.types;
+        List<ChannelType>? channelTypes;
+        if (_channelTypes != null && _channelTypes.isNotEmpty) {
+          channelTypes = _channelTypes;
+        } else {
+          // Needs support for news channels.
+          if (mirror.type.reflectedType == IChannel) {
+            // All channels are allowed
+            channelTypes = null;
+          } else if (mirror.type.reflectedType == IGuildChannel) {
+            // Only guild channels are allowed
+            channelTypes = [
+              ChannelType.category,
+              ChannelType.guildDirectory,
+              ChannelType.guildNews,
+              ChannelType.guildNewsThread,
+              ChannelType.guildPrivateThread,
+              ChannelType.guildPublicThread,
+              ChannelType.guildStage,
+              ChannelType.guildStore,
+              ChannelType.text,
+              ChannelType.voice
+            ];
+          } else if (mirror.type.reflectedType == IDMChannel) {
+            // Only direct messages are allowed
+            channelTypes = [ChannelType.dm, ChannelType.groupDm];
+          } else if (mirror.type.reflectedType == IVoiceGuildChannel) {
+            channelTypes = [ChannelType.voice];
+          } else if (mirror.type.reflectedType == ITextGuildChannel) {
+            channelTypes = [ChannelType.text, ChannelType.guildNews];
+          } else if (mirror.type.reflectedType == ITextChannel) {
+            channelTypes = [
+              ChannelType.text,
+              ChannelType.dm,
+              ChannelType.groupDm
+            ];
+          } else if (mirror.type.reflectedType == IStageVoiceGuildChannel) {
+            channelTypes = [ChannelType.guildStage];
+          } else if (mirror.type.reflectedType == IThreadChannel) {
+            channelTypes = [
+              ChannelType.guildPublicThread,
+              ChannelType.guildPrivateThread
+            ];
+          } else if (mirror.type.reflectedType == ICategoryGuildChannel) {
+            channelTypes = [ChannelType.category];
+          }
+        }
+
         options.add(CommandOptionBuilder(
           argumentConverter?.type ?? CommandOptionType.string,
           name,
           _mappedDescriptions[name]!.value,
           required: !mirror.isOptional,
           choices: choices?.toList(),
+          channelTypes: channelTypes,
         ));
       }
 
