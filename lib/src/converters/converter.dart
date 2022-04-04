@@ -46,6 +46,7 @@ import '../util/view.dart';
 /// - [roleConverter], which converts [IRole]s;
 /// - [mentionableConverter], which converts [Mentionable]s;
 /// - [threadConverter], which converts [IThreadChannel]s;
+/// - [channelConverter], which converts [IChannel]s;
 ///
 /// You can override these default implementations with your own by calling
 /// [CommandsPlugin.addConverter] with your own converter for one of the types mentioned above.
@@ -805,10 +806,15 @@ Future<dynamic> parse(
   }
 }
 
-const Converter<IChannel> channelConverter =
-    FallbackConverter([
-      CombineConverter<Snowflake, IChannel>(snowflakeConverter, snowflakeToChannel),
-    ]);
+const Converter<IChannel> channelConverter = FallbackConverter(
+  [
+    CombineConverter<Snowflake, IChannel>(
+      snowflakeConverter,
+      snowflakeToChannel<IChannel>,
+    ),
+  ],
+  type: CommandOptionType.channel
+);
 
 FutureOr<T>? snowflakeToChannel<T extends IChannel>(Snowflake id, IChatContext context) {
   final cached = context.client.channels[id] as T?;
@@ -844,9 +850,8 @@ Future<IThreadChannel?> snowflakeToThreadChannel(Snowflake id, IChatContext cont
       return cachedThreads[id];
     }
     final channels = context.guild!.channels.whereType<ITextGuildChannel>();
-    var i = 0;
-    while (i < channels.length) {
-      final channel = channels.elementAt(i);
+
+    for(final channel in channels) {
       final thread = (await channel.fetchActiveThreads())
           .threads
           .firstWhereSafe((thread) => thread.id == id);
@@ -869,7 +874,6 @@ Future<IThreadChannel?> snowflakeToThreadChannel(Snowflake id, IChatContext cont
         cachedThreads[privateArchivedThread.id] = privateArchivedThread;
         return privateArchivedThread;
       }
-      i++;
     }
   }
   return null;
@@ -930,6 +934,6 @@ void registerDefaultConverters(CommandsPlugin commands) {
     ..addConverter(roleConverter)
     ..addConverter(mentionableConverter)
     ..addConverter(attachmentConverter)
-    ..addConverter(threadConverter);
-    // ..addConverter(channelConverter);
+    ..addConverter(threadConverter)
+    ..addConverter(channelConverter);
 }
