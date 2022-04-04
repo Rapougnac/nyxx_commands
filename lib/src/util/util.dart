@@ -126,8 +126,7 @@ class Choices {
   const Choices(this.choices);
 
   /// Get the builders that this [Choices] represents.
-  Iterable<ArgChoiceBuilder> get builders =>
-      choices.entries.map((entry) => ArgChoiceBuilder(entry.key, entry.value));
+  Iterable<ArgChoiceBuilder> get builders => choices.entries.map((entry) => ArgChoiceBuilder(entry.key, entry.value));
 
   @override
   String toString() => 'Choices[choices=$choices]';
@@ -239,6 +238,6 @@ String Function(IMessage) dmOr(String Function(IMessage) defaultPrefix) {
 
 /// A pattern all command and argument names should match.
 ///
-/// For more inforrmation on naming restrictions, check the
+/// For more information on naming restrictions, check the
 /// [Discord documentation](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming).
 final RegExp commandNameRegexp = RegExp(r'^[\w-]{1,32}$', unicode: true);
