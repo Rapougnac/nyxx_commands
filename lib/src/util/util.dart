@@ -248,11 +248,11 @@ final RegExp commandNameRegexp = RegExp(r'^[\w-]{1,32}$', unicode: true);
 /// ```dart
 /// ChatCommand test = ChatCommand(
 ///  'test',
-///   'A test command',
-///   (
+///  'A test command',
+///  (
 ///   IChatContext context,
 ///   @ChannelTypes([ChannelType.text]) IChannel foo,
-///   ) async {
+///  ) async {
 ///     context.respond(MessageBuilder.content(foo.id.toString()));
 ///   },
 /// );
@@ -265,7 +265,7 @@ final RegExp commandNameRegexp = RegExp(r'^[\w-]{1,32}$', unicode: true);
 /// (
 ///   IChatContext context,
 ///   IVoiceGuildChannel foo, // on `foo` option, the values will be all voice channels
-///   ) async {
+///  ) async {
 ///     context.respond(MessageBuilder.content(foo.name));
 ///   },
 /// );
