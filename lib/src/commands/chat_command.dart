@@ -714,7 +714,8 @@ class ChatCommand
           } else if (mirror.type.reflectedType == IThreadChannel) {
             channelTypes = [
               ChannelType.guildPublicThread,
-              ChannelType.guildPrivateThread
+              ChannelType.guildPrivateThread,
+              ChannelType.guildNewsThread
             ];
           } else if (mirror.type.reflectedType == ICategoryGuildChannel) {
             channelTypes = [ChannelType.category];
