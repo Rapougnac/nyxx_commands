@@ -536,6 +536,8 @@ class CommandsPlugin extends BasePlugin implements ICommandGroup<IContext> {
             requiredPermissions: await allChecks.requiredPermissions,
             guild: guildId ?? guild,
             type: SlashCommandType.chat,
+            localizationsName: command.options.localeNames,
+            localizationsDescription: command.options.localeDescriptions,
           );
 
           if (command is ChatCommand && command.resolvedType != CommandType.textOnly) {
