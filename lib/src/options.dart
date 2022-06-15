@@ -53,6 +53,14 @@ class CommandsOptions implements CommandOptions {
   @override
   final CommandType defaultCommandType;
 
+  @override
+  // Here to avoid the linter complains
+  final Map<Locale, String>? localeNames = null;
+
+  @override
+  // Same as above
+  final Map<Locale, String>? localeDescriptions = null;
+
   /// Create a new set of [CommandsOptions].
   const CommandsOptions({
     this.logErrors = true,
