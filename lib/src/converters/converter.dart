@@ -139,14 +139,12 @@ class CombineConverter<R, T> implements Converter<T> {
   final void Function(CommandOptionBuilder)? _customProcessOptionCallback;
 
   @override
-  void Function(CommandOptionBuilder)? get processOptionCallback =>
-      _customProcessOptionCallback ?? converter.processOptionCallback;
+  void Function(CommandOptionBuilder)? get processOptionCallback => _customProcessOptionCallback ?? converter.processOptionCallback;
 
   final FutureOr<Iterable<ArgChoiceBuilder>?> Function(AutocompleteContext)? _autocompleteCallback;
 
   @override
-  FutureOr<Iterable<ArgChoiceBuilder>?> Function(AutocompleteContext)? get autocompleteCallback =>
-      _autocompleteCallback ?? converter.autocompleteCallback;
+  FutureOr<Iterable<ArgChoiceBuilder>?> Function(AutocompleteContext)? get autocompleteCallback => _autocompleteCallback ?? converter.autocompleteCallback;
 
   final Iterable<ArgChoiceBuilder>? _choices;
   final CommandOptionType? _type;
@@ -172,8 +170,7 @@ class CombineConverter<R, T> implements Converter<T> {
   CommandOptionType get type => _type ?? converter.type;
 
   @override
-  FutureOr<T?> Function(StringView view, IChatContext context) get convert =>
-      (view, context) async {
+  FutureOr<T?> Function(StringView view, IChatContext context) get convert => (view, context) async {
         R? ret = await converter.convert(view, context);
 
         if (ret != null) {
@@ -238,8 +235,7 @@ class FallbackConverter<T> implements Converter<T> {
       }
 
       for (final choice in converterChoices) {
-        ArgChoiceBuilder existing =
-            allChoices.singleWhere((element) => element.name == choice.name, orElse: () => choice);
+        ArgChoiceBuilder existing = allChoices.singleWhere((element) => element.name == choice.name, orElse: () => choice);
 
         if (existing.value != choice.value) {
           return null;
@@ -272,8 +268,7 @@ class FallbackConverter<T> implements Converter<T> {
   }
 
   @override
-  FutureOr<T?> Function(StringView view, IChatContext context) get convert =>
-      (view, context) async {
+  FutureOr<T?> Function(StringView view, IChatContext context) get convert => (view, context) async {
         StringView? used;
         T? ret = await converters.fold(Future.value(null), (previousValue, element) async {
           if (await previousValue != null) {
@@ -374,8 +369,7 @@ class IntConverter extends NumConverter<int> {
 /// This converter has a Discord Slash Command Argument Type of [CommandOptionType.integer].
 const Converter<int> intConverter = IntConverter();
 
-double? convertDouble(StringView view, IChatContext context) =>
-    double.tryParse(view.getQuotedWord());
+double? convertDouble(StringView view, IChatContext context) => double.tryParse(view.getQuotedWord());
 
 /// A converter that converts input to [double]s, possibly with a minimum or maximum value.
 ///
@@ -515,14 +509,7 @@ Future<IMember?> convertMember(StringView view, IChatContext context) async {
       }
     }
 
-    for (final list in [
-      usernameExact,
-      nickExact,
-      usernameCaseInsensitive,
-      nickCaseInsensitive,
-      usernameStart,
-      nickStart
-    ]) {
+    for (final list in [usernameExact, nickExact, usernameCaseInsensitive, nickCaseInsensitive, usernameStart, nickStart]) {
       if (list.length == 1) {
         return list.first;
       }
@@ -569,8 +556,7 @@ FutureOr<IUser?> memberToUser(IMember member, IChatContext context) => member.us
 FutureOr<IUser?> convertUser(StringView view, IChatContext context) {
   String word = view.getWord();
 
-  if (context.channel.channelType == ChannelType.dm ||
-      context.channel.channelType == ChannelType.groupDm) {
+  if (context.channel.channelType == ChannelType.dm || context.channel.channelType == ChannelType.groupDm) {
     List<IUser> exact = [];
     List<IUser> caseInsensitive = [];
     List<IUser> start = [];
@@ -704,12 +690,10 @@ class GuildChannelConverter<T extends IGuildChannel> implements Converter<T> {
       };
 
   @override
-  void Function(CommandOptionBuilder) get processOptionCallback =>
-      (builder) => builder.channelTypes = channelTypes;
+  void Function(CommandOptionBuilder) get processOptionCallback => (builder) => builder.channelTypes = channelTypes;
 
   @override
-  FutureOr<Iterable<ArgChoiceBuilder>?> Function(AutocompleteContext)? get autocompleteCallback =>
-      null;
+  FutureOr<Iterable<ArgChoiceBuilder>?> Function(AutocompleteContext)? get autocompleteCallback => null;
 
   @override
   Type get output => T;
@@ -757,8 +741,7 @@ const GuildChannelConverter<IVoiceGuildChannel> voiceGuildChannelConverter = Gui
 ///
 /// This converter has a Discord Slash Command argument type of [CommandOptionType.channel] and it
 /// set to accept channels of type [ChannelType.category].
-const GuildChannelConverter<ICategoryGuildChannel> categoryGuildChannelConverter =
-    GuildChannelConverter([
+const GuildChannelConverter<ICategoryGuildChannel> categoryGuildChannelConverter = GuildChannelConverter([
   ChannelType.category,
 ]);
 
@@ -770,8 +753,7 @@ const GuildChannelConverter<ICategoryGuildChannel> categoryGuildChannelConverter
 ///
 /// This converter has a Discord Slash Command argument type of [CommandOptionType.channel] and is
 /// set to accept channels of type [ChannelType.guildStage].
-const GuildChannelConverter<IStageVoiceGuildChannel> stageVoiceChannelConverter =
-    GuildChannelConverter([
+const GuildChannelConverter<IStageVoiceGuildChannel> stageVoiceChannelConverter = GuildChannelConverter([
   ChannelType.guildStage,
 ]);
 

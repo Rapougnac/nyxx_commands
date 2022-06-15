@@ -21,9 +21,7 @@ import '../context/component_wrappers.dart';
 import '../context/interaction_context.dart';
 
 /// Represents a context in which a [UserCommand] was executed.
-class UserContext
-    with InteractionContextMixin, ComponentWrappersMixin
-    implements IInteractionContext {
+class UserContext with InteractionContextMixin, ComponentWrappersMixin implements IInteractionContext {
   /// The member that was selected by the user when running the command if the command was invoked
   /// in a guild, `null` otherwise.
   final IMember? targetMember;

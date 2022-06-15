@@ -75,7 +75,7 @@ class GuildCheck extends Check {
   ///
   /// You might also be interested in:
   /// - [GuildCheck.anyId], for creating the same check without instances of [IGuild].
-  GuildCheck.any(Iterable<IGuild> guilds, [String? name])
+  GuildCheck.any(Iterable<IGuild> guilds, [String? name]) 
       : this.anyId(guilds.map((guild) => guild.id), name);
 
   /// Create a [GuildCheck] that succeeds if the id of the guild the context originated in is in

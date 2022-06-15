@@ -102,6 +102,14 @@ ClassElement? useConverterClassElement;
 int get autocompleteId => getId(autocompleteClassElement!.thisType);
 ClassElement? autocompleteClassElement;
 
+/// The ID of the [LocalizedNames] class type.
+int get localizedNamesId => getId(localizedNamesClassElement!.thisType);
+ClassElement? localizedNamesClassElement;
+
+/// The ID of the [LocalizedDescriptions] class type.
+int get localizedDescriptionsId => getId(localizedDescriptionsClassElement!.thisType);
+ClassElement? localizedDescriptionsClassElement;
+
 /// The ID of the [Object] class type.
 int get objectId => getId(objectClassElement!.thisType);
 ClassElement? objectClassElement;
@@ -120,6 +128,10 @@ Map<List<String>, void Function(ClassElement)> _specialInterfaceTypeSetters = {
       useConverterClassElement = element,
   ['package:nyxx_commands/src/util/util.dart', 'Autocomplete']: (element) =>
       autocompleteClassElement = element,
+  ['package:nyxx_commands/src/util/util.dart', 'LocalesName']: (element) =>
+      localizedNamesClassElement = element,
+  ['package:nyxx_commands/src/util/util.dart', 'LocalesDescription']: (element) =>
+      localizedDescriptionsClassElement = element,
   ['dart:core/object.dart', 'Object']: (element) => objectClassElement = element,
   ['dart:core/function.dart', 'Function']: (element) => functionClassElement = element,
 };

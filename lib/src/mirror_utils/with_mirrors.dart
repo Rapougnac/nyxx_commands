@@ -18,10 +18,10 @@ import 'dart:mirrors';
 import 'package:nyxx_commands/src/commands.dart';
 import 'package:nyxx_commands/src/mirror_utils/mirror_utils.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
+import 'package:nyxx_commands/src/util/util.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';
 
-bool isAssignableTo(Type instance, Type target) =>
-    instance == target || reflectType(instance).isSubtypeOf(reflectType(target));
+bool isAssignableTo(Type instance, Type target) => instance == target || reflectType(instance).isSubtypeOf(reflectType(target));
 
 FunctionData loadFunctionData(Function fn) {
   List<ParameterData> parametersData = [];
@@ -39,11 +39,9 @@ FunctionData loadFunctionData(Function fn) {
     String name = MirrorSystem.getName(parameterMirror.simpleName);
 
     // Get parameter type
-    Type type =
-        parameterMirror.type.hasReflectedType ? parameterMirror.type.reflectedType : dynamic;
+    Type type = parameterMirror.type.hasReflectedType ? parameterMirror.type.reflectedType : dynamic;
 
-    Iterable<T> getAnnotations<T>() =>
-        parameterMirror.metadata.map((e) => e.reflectee).whereType<T>();
+    Iterable<T> getAnnotations<T>() => parameterMirror.metadata.map((e) => e.reflectee).whereType<T>();
 
     // Get parameter description (if any)
 
@@ -67,6 +65,28 @@ FunctionData loadFunctionData(Function fn) {
     Map<String, dynamic>? choices;
     if (choicesAnnotations.isNotEmpty) {
       choices = choicesAnnotations.first.choices;
+    }
+
+    Iterable<LocalesName> localesName = getAnnotations<LocalesName>();
+
+    if (localesName.length > 1) {
+      throw CommandRegistrationError('parameters may have at most one LocalesName decorator');
+    }
+
+    Map<Locale, String>? localesNameValue;
+    if (localesName.isNotEmpty) {
+      localesNameValue = localesName.first.names;
+    }
+
+    Iterable<LocalesDescription> localesDescription = getAnnotations<LocalesDescription>();
+
+    if (localesDescription.length > 1) {
+      throw CommandRegistrationError('parameters may have at most one LocalesDescription decorator');
+    }
+
+    Map<Locale, String>? localesDescriptionValue;
+    if (localesDescription.isNotEmpty) {
+      localesDescriptionValue = localesDescription.first.descriptions;
     }
 
     // Get parameter converter override
@@ -95,9 +115,11 @@ FunctionData loadFunctionData(Function fn) {
 
     parametersData.add(ParameterData(
       name: name,
+      localesName: localesNameValue,
       type: type,
       isOptional: parameterMirror.isOptional,
       description: description,
+      localesDescription: localesDescriptionValue,
       defaultValue: parameterMirror.defaultValue?.reflectee,
       choices: choices,
       converterOverride: converterOverride,

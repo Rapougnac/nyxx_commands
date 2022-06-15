@@ -22,9 +22,7 @@ import 'component_wrappers.dart';
 import 'interaction_context.dart';
 
 /// Representsa  context in which a [MessageCommand] was executed.
-class MessageContext
-    with InteractionContextMixin, ComponentWrappersMixin
-    implements IInteractionContext {
+class MessageContext with InteractionContextMixin, ComponentWrappersMixin implements IInteractionContext {
   /// The messsage that the user selected when running this command.
   final IMessage targetMessage;
 

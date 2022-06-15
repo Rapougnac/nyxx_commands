@@ -47,8 +47,10 @@ Iterable<CompileTimeFunctionData> getFunctionData(
       // The context parameter
       CompileTimeParameterData(
         parameterList.parameterElements.first!.name,
+        null,
         parameterList.parameterElements.first!.type,
         false,
+        null,
         null,
         null,
         null,
@@ -87,7 +89,12 @@ Iterable<CompileTimeFunctionData> getFunctionData(
 
       Iterable<Annotation> nameAnnotations = annotationsWithType(nameId);
 
+      Iterable<Annotation> localizedNameAnnotations = annotationsWithType(localizedNamesId);
+
       Iterable<Annotation> descriptionAnnotations = annotationsWithType(descriptionId);
+
+      Iterable<Annotation> localizedDescriptionAnnotations =
+          annotationsWithType(localizedDescriptionsId);
 
       Iterable<Annotation> choicesAnnotations = annotationsWithType(choicesId);
 
@@ -109,7 +116,9 @@ Iterable<CompileTimeFunctionData> getFunctionData(
       }
 
       String name;
+      Expression? localizedNames;
       String? description;
+      Expression? localizedDescriptions;
       Expression? choices;
       Expression? defaultValue;
       Annotation? converterOverride;
@@ -147,9 +156,11 @@ Iterable<CompileTimeFunctionData> getFunctionData(
 
       parameterData.add(CompileTimeParameterData(
         name,
+        localizedNames,
         parameter.declaredElement!.type,
         parameter.isOptional,
         description,
+        localizedDescriptions,
         defaultValue,
         choices,
         converterOverride,

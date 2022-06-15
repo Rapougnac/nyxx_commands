@@ -44,9 +44,7 @@ import 'options.dart';
 /// - [CommandsPlugin.addCommand], for adding commands to your bot;
 /// - [ChatCommand], for creating chat commands;
 /// - [MessageCommand], for creating message commands.
-class UserCommand
-    with ParentMixin<UserContext>, CheckMixin<UserContext>, OptionsMixin<UserContext>
-    implements ICommand<UserContext> {
+class UserCommand with ParentMixin<UserContext>, CheckMixin<UserContext>, OptionsMixin<UserContext> implements ICommand<UserContext> {
   @override
   final String name;
 

@@ -220,6 +220,74 @@ class Autocomplete {
   const Autocomplete(this.callback);
 }
 
+/// An annotation used to add localizations to a command name.
+///
+/// As an example, using german localization for the command name and fallback to english:
+/// ```dart
+/// ChatCommand test = ChatCommand(
+///  'hi',
+///  'A test command',
+///  (
+///   IChatContext context,
+///   @LocalesName({Locale.german: 'hallo'}) String message,
+///  ) async {
+///     context.respond(MessageBuilder.content(message));
+///   },
+/// );
+/// ```
+///
+/// ![](https://user-images.githubusercontent.com/74512338/173841767-6e2c5215-ebc3-4a89-a2ac-8115949e2f0b.png)
+/// ![](https://user-images.githubusercontent.com/74512338/173842327-4e6c9c6a-4e6d-45af-9942-b6e04f1b5f0e.png)
+///
+/// You might also be interested in:
+/// - [Name] to set the name of the command;
+/// - [LocalesDescription] to set the localized description of the command;
+/// - [Description] to set the description of the command;
+/// - [Locale] to see avaliable locales.
+class LocalesName {
+  /// The localized names for this arg.
+  final Map<Locale, String> names;
+
+  /// Create a new [LocalesName].
+  ///
+  /// This is intended to be used as an `@LocalesName(...)` annotation, and has no functionality as
+  /// a standalone class.
+  const LocalesName(this.names);
+}
+
+/// Annotation used to add localizations to a command description.
+///
+/// As an example, using german localization for the command description and fallback to english:
+/// ```dart
+/// ChatCommand test = ChatCommand(
+/// 'hi',
+/// 'A test command',
+/// (
+///    IChatContext context,
+///    @LocalesDescription({Locale.german: 'Ein Testbefehl'}) String message,
+///  ) async {
+///     context.respond(MessageBuilder.content(message));
+///   },
+/// );
+/// ```
+///
+/// ![](https://user-images.githubusercontent.com/54505189/156937204-bbcd5c95-ff0f-40c2-944d-9988fd7b6a60.png) <!-- TODO: Add another image -->
+///
+/// You might also be interested in:
+/// - [Description] to set the description of the command;
+/// - [Locale] to see avaliable locales;
+/// - [LocalesName] to set the name of the command.
+class LocalesDescription {
+  /// The localized descriptions for this arg.
+  final Map<Locale, String> descriptions;
+
+  /// Create a new [LocalesDescription].
+  ///
+  /// This is intended to be used as an `@LocalesDescription(...)` annotation, and has no functionality as
+  /// a standalone class.
+  const LocalesDescription(this.descriptions);
+}
+
 final RegExp _mentionPattern = RegExp(r'^<@!?([0-9]{15,20})>');
 
 /// A wrapper function for prefixes that allows commands to be invoked with a mention prefix.

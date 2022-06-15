@@ -69,8 +69,7 @@ abstract class IOptions {
 ///
 /// You might also be interested in:
 /// - [ICommandGroup], the interface for groups that [ICommandRegisterable]s can be added to.
-abstract class ICommandRegisterable<T extends IContext>
-    implements ICallHooked<T>, IChecked, IOptions {
+abstract class ICommandRegisterable<T extends IContext> implements ICallHooked<T>, IChecked, IOptions {
   /// The name of this child.
   ///
   /// Generally, this will have to obey [Discord's command naming restrictions](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming)
@@ -159,8 +158,7 @@ abstract class ICommand<T extends IContext> implements ICommandRegisterable<T> {
 /// You might also be interested in:
 /// - [ChatCommand] and [ChatGroup], the concrete implementations of elements in a chat command
 ///   tree.
-abstract class IChatCommandComponent
-    implements ICommandRegisterable<IChatContext>, ICommandGroup<IChatContext> {
+abstract class IChatCommandComponent implements ICommandRegisterable<IChatContext>, ICommandGroup<IChatContext> {
   /// The description of this entity.
   ///
   /// This must be a non-empty string less than 100 characters in length.

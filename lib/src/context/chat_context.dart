@@ -109,8 +109,7 @@ class MessageChatContext with ComponentWrappersMixin implements IChatContext {
   });
 
   @override
-  Future<IMessage> respond(MessageBuilder builder,
-      {bool mention = true, bool private = false}) async {
+  Future<IMessage> respond(MessageBuilder builder, {bool mention = true, bool private = false}) async {
     if (private) {
       return user.sendMessage(builder);
     } else {
@@ -138,9 +137,7 @@ class MessageChatContext with ComponentWrappersMixin implements IChatContext {
 ///
 /// You might also be interested in:
 /// - [MessageChatContext], for chat commands invoked from text messages.
-class InteractionChatContext
-    with InteractionContextMixin, ComponentWrappersMixin
-    implements IChatContext, IInteractionContext {
+class InteractionChatContext with InteractionContextMixin, ComponentWrappersMixin implements IChatContext, IInteractionContext {
   /// The unparsed arguments from the interaction.
   ///
   /// You might also be interested in:
@@ -192,6 +189,5 @@ class InteractionChatContext
   });
 
   @override
-  String toString() =>
-      'InteractionContext[interaction=${interaction.token}, arguments=$rawArguments]';
+  String toString() => 'InteractionContext[interaction=${interaction.token}, arguments=$rawArguments]';
 }

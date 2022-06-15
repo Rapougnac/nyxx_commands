@@ -80,8 +80,7 @@ mixin InteractionContextMixin implements IInteractionContext {
         // interaction was already ACKed by timeout or [acknowledge], hidden state of ACK might not
         // be what we expect
         if (_originalAckHidden != hidden) {
-          await interactionEvent
-              .sendFollowup(MessageBuilder.content(MessageBuilder.clearCharacter));
+          await interactionEvent.sendFollowup(MessageBuilder.content(MessageBuilder.clearCharacter));
           if (!_originalAckHidden) {
             // If original response was hidden, we can't delete it
             await interactionEvent.deleteOriginalResponse();

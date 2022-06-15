@@ -22,6 +22,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:logging/logging.dart';
 import 'package:nyxx_commands/src/errors.dart';
+import 'package:nyxx_interactions/nyxx_interactions.dart';
 import 'package:path/path.dart';
 
 import 'function_metadata/compile_time_function_data.dart';
@@ -411,6 +412,23 @@ void writeFunctionData(
         imports.addAll(autocompleteOverrideData.skip(1));
 
         autocompleteSource = autocompleteOverrideData.first;
+      }
+
+      Map<Locale, String>? localizedNames;
+
+      if (parameter.localizedNames != null) {
+        List<String>? localizedNamesData = toExpressionSource(parameter.localizedNames!);
+
+        if (localizedNamesData == null) {
+          logger.warning(
+            'Unable to resolve localized names for parameter ${parameter.name}, skipping function',
+          );
+          continue outerLoop;
+        }
+
+        imports.addAll(localizedNamesData.skip(1));
+
+        localizedNames = {};
       }
 
       parameterDataSource += '''

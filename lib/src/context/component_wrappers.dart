@@ -26,11 +26,7 @@ mixin ComponentWrappersMixin implements IContext {
           .where((event) => event.interaction.customId == selectionMenu.customId)
           .map((event) => event..acknowledge())
           .where(
-            (event) =>
-                !authorOnly ||
-                (event.interaction.memberAuthor ?? event.interaction.userAuthor as SnowflakeEntity)
-                        .id ==
-                    user.id,
+            (event) => !authorOnly || (event.interaction.memberAuthor ?? event.interaction.userAuthor as SnowflakeEntity).id == user.id,
           )
           .timeout(
             timeout ?? Duration(),
@@ -39,18 +35,12 @@ mixin ComponentWrappersMixin implements IContext {
           .first;
 
   @override
-  Future<IButtonInteractionEvent> getButtonPress(Iterable<ButtonBuilder> buttons,
-          {bool authorOnly = true, Duration? timeout = const Duration(minutes: 12)}) =>
+  Future<IButtonInteractionEvent> getButtonPress(Iterable<ButtonBuilder> buttons, {bool authorOnly = true, Duration? timeout = const Duration(minutes: 12)}) =>
       commands.interactions.events.onButtonEvent
-          .where((event) =>
-              buttons.map((button) => button.customId).contains(event.interaction.customId))
+          .where((event) => buttons.map((button) => button.customId).contains(event.interaction.customId))
           .map((event) => event..acknowledge())
           .where(
-            (event) =>
-                !authorOnly ||
-                (event.interaction.memberAuthor ?? event.interaction.userAuthor as SnowflakeEntity)
-                        .id ==
-                    user.id,
+            (event) => !authorOnly || (event.interaction.memberAuthor ?? event.interaction.userAuthor as SnowflakeEntity).id == user.id,
           )
           .timeout(
             timeout ?? Duration(),
@@ -81,8 +71,7 @@ mixin ComponentWrappersMixin implements IContext {
       componentMessageBuilder.componentRows = [];
     }
 
-    ButtonBuilder confirmButton =
-        ButtonBuilder(confirmMessage, randomAlpha(10), ButtonStyle.success);
+    ButtonBuilder confirmButton = ButtonBuilder(confirmMessage, randomAlpha(10), ButtonStyle.success);
 
     ButtonBuilder denyButton = ButtonBuilder(denyMessage, randomAlpha(10), ButtonStyle.danger);
 

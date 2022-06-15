@@ -37,8 +37,7 @@ class UserCheck extends Check {
   ///
   /// You might also be interested in:
   /// - [UserCheck.anyId], for creating this same check without instance of [IUser].
-  UserCheck.any(Iterable<IUser> users, [String? name])
-      : this.anyId(users.map((user) => user.id), name);
+  UserCheck.any(Iterable<IUser> users, [String? name]) : this.anyId(users.map((user) => user.id), name);
 
   /// Create a new [UserCheck] that succeeds if the ID of the user that created the context is in
   /// [ids].
@@ -76,8 +75,7 @@ class RoleCheck extends Check {
   ///
   /// You might also be interested in:
   /// - [RoleCheck.anyId], for creating this same check without instances of [IRole].
-  RoleCheck.any(Iterable<IRole> roles, [String? name])
-      : this.anyId(roles.map((role) => role.id), name);
+  RoleCheck.any(Iterable<IRole> roles, [String? name]) : this.anyId(roles.map((role) => role.id), name);
 
   /// Create a new [RoleCheck] that succeeds if the user that created the context has any role for
   /// which the role's id is in [roles].

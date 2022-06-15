@@ -104,8 +104,7 @@ bool _isAAssignableToB(int aId, int bId, Map<int, TypeData> typeTree) {
     }
   } else if (a is FunctionTypeData && b is InterfaceTypeData) {
     // Functions can only be assigned to [Object] and [Function] interface types
-    return (b.id == _typeMappings![Object]! || b.id == _typeMappings![Function]!) &&
-        (b.isNullable || !a.isNullable);
+    return (b.id == _typeMappings![Object]! || b.id == _typeMappings![Function]!) && (b.isNullable || !a.isNullable);
   } else if (a is InterfaceTypeData && b is FunctionTypeData) {
     // Objects cannot be assigned to functions
     return false;
@@ -120,8 +119,7 @@ bool _isAAssignableToB(int aId, int bId, Map<int, TypeData> typeTree) {
 
     // Parameter types can be widened but not narrowed
     for (int i = 0; i < a.positionalParameterTypes.length; i++) {
-      if (!_isAAssignableToB(
-          a.positionalParameterTypes[i], b.positionalParameterTypes[i], typeTree)) {
+      if (!_isAAssignableToB(a.positionalParameterTypes[i], b.positionalParameterTypes[i], typeTree)) {
         return false;
       }
     }

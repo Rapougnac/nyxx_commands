@@ -83,8 +83,7 @@ abstract class IContext implements IContextBase {
   ///
   /// You might also be interested in:
   /// - [getConfirmation], a shortcut for getting user confirmation from buttons.
-  Future<IButtonInteractionEvent> getButtonPress(Iterable<ButtonBuilder> buttons,
-      {bool authorOnly = true, Duration? timeout = const Duration(minutes: 12)});
+  Future<IButtonInteractionEvent> getButtonPress(Iterable<ButtonBuilder> buttons, {bool authorOnly = true, Duration? timeout = const Duration(minutes: 12)});
 
   /// Send a message prompting a user for confirmation, then return whether the user accepted the
   /// choice.
@@ -97,8 +96,5 @@ abstract class IContext implements IContextBase {
   /// [confirmMessage] and [denyMessage] can be set to change the text displayed on the "confirm"
   /// and "deny" buttons.
   Future<bool> getConfirmation(MessageBuilder message,
-      {bool authorOnly = true,
-      Duration? timeout = const Duration(minutes: 12),
-      String confirmMessage = 'Yes',
-      String denyMessage = 'No'});
+      {bool authorOnly = true, Duration? timeout = const Duration(minutes: 12), String confirmMessage = 'Yes', String denyMessage = 'No'});
 }

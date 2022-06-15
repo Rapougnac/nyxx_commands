@@ -82,13 +82,11 @@ mixin ChatGroupMixin implements IChatCommandComponent {
   @override
   void addCommand(ICommandRegisterable<IChatContext> command) {
     if (command is! IChatCommandComponent) {
-      throw CommandsError(
-          'All child commands of chat groups or commands must implement IChatCommandComponent');
+      throw CommandsError('All child commands of chat groups or commands must implement IChatCommandComponent');
     }
 
     if (_childrenMap.containsKey(command.name)) {
-      throw CommandRegistrationError(
-          'Command with name "$fullName ${command.name}" already exists');
+      throw CommandRegistrationError('Command with name "$fullName ${command.name}" already exists');
     }
 
     for (final alias in command.aliases) {
@@ -152,16 +150,10 @@ mixin ChatGroupMixin implements IChatCommandComponent {
   }
 
   @override
-  String get fullName =>
-      (parent == null || parent is! ICommandRegisterable
-          ? ''
-          : (parent as ICommandRegisterable).name + ' ') +
-      name;
+  String get fullName => (parent == null || parent is! ICommandRegisterable ? '' : (parent as ICommandRegisterable).name + ' ') + name;
 
   @override
-  bool get hasSlashCommand => children.any((child) =>
-      (child is ChatCommand && child.resolvedType != CommandType.textOnly) ||
-      child.hasSlashCommand);
+  bool get hasSlashCommand => children.any((child) => (child is ChatCommand && child.resolvedType != CommandType.textOnly) || child.hasSlashCommand);
 
   @override
   Iterable<CommandOptionBuilder> getOptions(CommandsPlugin commands) {
@@ -197,13 +189,7 @@ mixin ChatGroupMixin implements IChatCommandComponent {
 ///
 /// You might also be interested in:
 /// - [ChatCommand], for creating commands that can be added to groups.
-class ChatGroup
-    with
-        ChatGroupMixin,
-        ParentMixin<IChatContext>,
-        CheckMixin<IChatContext>,
-        OptionsMixin<IChatContext>
-    implements IChatCommandComponent {
+class ChatGroup with ChatGroupMixin, ParentMixin<IChatContext>, CheckMixin<IChatContext>, OptionsMixin<IChatContext> implements IChatCommandComponent {
   @override
   final List<String> aliases;
 
@@ -266,11 +252,7 @@ class ChatGroup
 /// - [MessageCommand], for creating Message Commands;
 /// - [UserCommand], for creating User Commands.
 class ChatCommand
-    with
-        ChatGroupMixin,
-        ParentMixin<IChatContext>,
-        CheckMixin<IChatContext>,
-        OptionsMixin<IChatContext>
+    with ChatGroupMixin, ParentMixin<IChatContext>, CheckMixin<IChatContext>, OptionsMixin<IChatContext>
     implements ICommand<IChatContext>, IChatCommandComponent {
   @override
   final String name;
@@ -460,16 +442,14 @@ class ChatCommand
     }
 
     if (!isAssignableTo(contextType, _functionData.parametersData.first.type)) {
-      throw CommandRegistrationError(
-          'The first parameter of a command callback must be of type $contextType');
+      throw CommandRegistrationError('The first parameter of a command callback must be of type $contextType');
     }
 
     // Skip context parameter
     for (final parameter in _functionData.parametersData.skip(1)) {
       if (parameter.description != null) {
         if (parameter.description!.isEmpty || parameter.description!.length > 100) {
-          throw CommandRegistrationError(
-              'Descriptions must not be empty nor longer than 100 characters');
+          throw CommandRegistrationError('Descriptions must not be empty nor longer than 100 characters');
         }
       }
 
@@ -563,11 +543,9 @@ class ChatCommand
       List<CommandOptionBuilder> options = [];
 
       for (final parameter in _functionData.parametersData.skip(1)) {
-        Converter<dynamic>? argumentConverter =
-            parameter.converterOverride ?? commands.getConverter(parameter.type);
+        Converter<dynamic>? argumentConverter = parameter.converterOverride ?? commands.getConverter(parameter.type);
 
-        Iterable<ArgChoiceBuilder>? choices =
-            parameter.choices?.entries.map((entry) => ArgChoiceBuilder(entry.key, entry.value));
+        Iterable<ArgChoiceBuilder>? choices = parameter.choices?.entries.map((entry) => ArgChoiceBuilder(entry.key, entry.value));
 
         choices ??= argumentConverter?.choices;
 
@@ -577,6 +555,7 @@ class ChatCommand
           parameter.description ?? 'No description provided',
           required: !parameter.isOptional,
           choices: choices?.toList(),
+          localizationsName: parameter.localesName,
         );
 
         argumentConverter?.processOptionCallback?.call(builder);
@@ -594,13 +573,11 @@ class ChatCommand
   @override
   void addCommand(ICommandRegisterable<IChatContext> command) {
     if (command is! IChatCommandComponent) {
-      throw CommandsError(
-          'All child commands of chat groups or commands must implement IChatCommandComponent');
+      throw CommandsError('All child commands of chat groups or commands must implement IChatCommandComponent');
     }
 
     if (resolvedType != CommandType.textOnly) {
-      if (command.hasSlashCommand ||
-          (command is ChatCommand && command.resolvedType != CommandType.textOnly)) {
+      if (command.hasSlashCommand || (command is ChatCommand && command.resolvedType != CommandType.textOnly)) {
         throw CommandRegistrationError('Cannot nest Slash commands!');
       }
     }

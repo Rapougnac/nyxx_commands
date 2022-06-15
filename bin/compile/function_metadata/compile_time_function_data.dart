@@ -34,6 +34,9 @@ class CompileTimeParameterData {
   /// The name of this parameter.
   final String name;
 
+  /// The localized names of this parameter.
+  final Expression? localizedNames;
+
   /// The type of this parameter.
   final DartType type;
 
@@ -44,6 +47,9 @@ class CompileTimeParameterData {
 
   /// The description of this parameter.
   final String? description;
+
+  /// The localized descriptions of this parameter.
+  final Expression? localizedDescriptions;
 
   /// The default value of this parameter.
   final Expression? defaultValue;
@@ -59,9 +65,11 @@ class CompileTimeParameterData {
 
   const CompileTimeParameterData(
     this.name,
+    this.localizedNames,
     this.type,
     this.isOptional,
     this.description,
+    this.localizedDescriptions,
     this.defaultValue,
     this.choices,
     this.converterOverride,
@@ -70,9 +78,11 @@ class CompileTimeParameterData {
 
   @override
   String toString() => 'CompileTimeParameterData[name=$name, '
+      'localizedNames=$localizedNames, '
       'type=${type.getDisplayString(withNullability: true)}, '
       'isOptional=$isOptional, '
       'description=$description, '
+      'localizedDescriptions=$localizedDescriptions, '
       'defaultValue=$defaultValue, '
       'choices=$choices, '
       'converterOverride=$converterOverride,'
