@@ -38,8 +38,6 @@ Iterable<CompileTimeFunctionData> getFunctionData(
     int startLine = lineInfo.getLocation(parent.beginToken.offset).lineNumber;
     int endLine = lineInfo.getLocation(parent.endToken.offset).lineNumber;
 
-    print('Processing id invocation at line $startLine and ending at line $endLine');
-
     if (id.argumentList.arguments.length != 2) {
       logger.shout(
           'Unexpected number of arguments ${id.argumentList.arguments.length} in id invocation');

@@ -21,8 +21,6 @@ FunctionData loadFunctionData(Function fn) {
   List<ParameterData<dynamic>> parametersData = [];
 
   ClosureMirror closureMirror = (reflect(fn) as ClosureMirror);
-  print(
-      'Column: ${closureMirror.function.location?.column} - Line: ${closureMirror.function.location?.line}');
   MethodMirror fnMirror = closureMirror.function;
 
   for (final parameterMirror in fnMirror.parameters) {
