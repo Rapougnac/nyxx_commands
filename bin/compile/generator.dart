@@ -92,7 +92,11 @@ Future<Iterable<CompileTimeFunctionData>> processFunctions(
 
   logger.fine('Found ${functionBuilder.ids.length} function instances');
 
-  final Iterable<CompileTimeFunctionData> data = getFunctionData(functionBuilder.ids);
+  var session = result.session;
+  var library = session.getParsedLibraryByElement(result) as ParsedLibraryResult;
+  var unit = library.units.first;
+
+  final Iterable<CompileTimeFunctionData> data = getFunctionData(functionBuilder.ids, unit.unit);
 
   logger.info('Got data for ${data.length} functions');
 
@@ -335,7 +339,9 @@ void writeFunctionData(
 
     result.write(parameterDataSource);
 
-    result.write(']),');
+    result.write('],');
+    result.write('${function.lines},');
+    result.write("'${function.filePath}',),");
   }
 
   result.write('};');

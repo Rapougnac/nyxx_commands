@@ -15,6 +15,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/element/element.dart';
 import 'package:nyxx_commands/nyxx_commands.dart' show CommandsError;
 
@@ -24,11 +25,21 @@ import 'compile_time_function_data.dart';
 /// Convert [idCreations] into function metadata.
 Iterable<CompileTimeFunctionData> getFunctionData(
   Iterable<InvocationExpression> ids,
+  CompilationUnit unit,
 ) {
   List<CompileTimeFunctionData> result = [];
 
+  LineInfo lineInfo = unit.lineInfo;
+
   outerLoop:
   for (final id in ids) {
+    InstanceCreationExpression parent = (id.parent?.parent as InstanceCreationExpression?) ??
+        (throw CommandsError('Id invocation has no parent'));
+    int startLine = lineInfo.getLocation(parent.beginToken.offset).lineNumber;
+    int endLine = lineInfo.getLocation(parent.endToken.offset).lineNumber;
+
+    print('Processing id invocation at line $startLine and ending at line $endLine');
+
     if (id.argumentList.arguments.length != 2) {
       logger.shout(
           'Unexpected number of arguments ${id.argumentList.arguments.length} in id invocation');
@@ -173,7 +184,16 @@ Iterable<CompileTimeFunctionData> getFunctionData(
       ));
     }
 
-    result.add(CompileTimeFunctionData(id.argumentList.arguments.first, parameterData));
+    Uri sourceUri = parent.thisOrAncestorOfType<CompilationUnit>()!.declaredElement!.source.uri;
+
+    result.add(
+      CompileTimeFunctionData(
+        id.argumentList.arguments.first,
+        parameterData,
+        (startLine, endLine),
+        sourceUri.toString(),
+      ),
+    );
   }
 
   return result;
