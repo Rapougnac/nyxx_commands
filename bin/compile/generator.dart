@@ -92,11 +92,7 @@ Future<Iterable<CompileTimeFunctionData>> processFunctions(
 
   logger.fine('Found ${functionBuilder.ids.length} function instances');
 
-  var session = result.session;
-  var library = session.getParsedLibraryByElement(result) as ParsedLibraryResult;
-  var unit = library.units.first;
-
-  final Iterable<CompileTimeFunctionData> data = getFunctionData(functionBuilder.ids, unit.unit);
+  final Iterable<CompileTimeFunctionData> data = getFunctionData(functionBuilder.ids);
 
   logger.info('Got data for ${data.length} functions');
 
