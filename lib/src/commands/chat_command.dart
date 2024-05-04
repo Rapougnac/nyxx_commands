@@ -461,8 +461,12 @@ class ChatCommand
         Converter<dynamic>? argumentConverter =
             parameter.converterOverride ?? commands.getConverter(parameter.type);
 
-        Iterable<CommandOptionChoiceBuilder<dynamic>>? choices = parameter.choices?.entries
-            .map((entry) => CommandOptionChoiceBuilder(name: entry.key, value: entry.value));
+        Iterable<CommandOptionChoiceBuilder<dynamic>>? choices =
+            parameter.choices?.entries.indexed.map((entry) => CommandOptionChoiceBuilder(
+                  name: entry.$2.key,
+                  value: entry.$2.value,
+                  nameLocalizations: parameter.localizedChoices?[entry.$1],
+                ));
 
         choices ??= argumentConverter?.choices;
 
