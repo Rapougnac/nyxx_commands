@@ -20,7 +20,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/element/element.dart';
 import 'package:nyxx_commands/nyxx_commands.dart' show CommandsError;
-import 'package:dart_style/dart_style.dart';
 
 import '../generator.dart';
 import 'compile_time_function_data.dart';

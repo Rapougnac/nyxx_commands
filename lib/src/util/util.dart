@@ -133,7 +133,7 @@ class Choices {
   /// The localized names for the choices.
   ///
   /// The keys are the locales and the values are the localized names for the choices that will be displayed in the Discord UI.
-  final Map<Locale, String>? nameLocalizations;
+  final List<Map<Locale, String>>? nameLocalizations;
 
   /// Create a new [Choices].
   ///
@@ -142,12 +142,12 @@ class Choices {
   const Choices(this.choices, [this.nameLocalizations]);
 
   /// Get the builders that this [Choices] represents.
-  Iterable<CommandOptionChoiceBuilder<dynamic>> get builders => choices.entries.map(
+  Iterable<CommandOptionChoiceBuilder<dynamic>> get builders => choices.entries.indexed.map(
         (entry) => CommandOptionChoiceBuilder(
-          name: entry.key,
-          value: entry.value,
-          nameLocalizations: nameLocalizations,
-        )
+          name: entry.$2.key,
+          value: entry.$2.value,
+          nameLocalizations: nameLocalizations?[entry.$1],
+        ),
       );
 
   @override
