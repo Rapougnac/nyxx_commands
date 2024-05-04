@@ -20,7 +20,8 @@ FunctionData loadFunctionData(Function fn) {
 
   List<ParameterData<dynamic>> parametersData = [];
 
-  MethodMirror fnMirror = (reflect(fn) as ClosureMirror).function;
+  ClosureMirror closureMirror = (reflect(fn) as ClosureMirror);
+  MethodMirror fnMirror = closureMirror.function;
 
   for (final parameterMirror in fnMirror.parameters) {
     if (parameterMirror.isNamed) {
@@ -119,7 +120,14 @@ FunctionData loadFunctionData(Function fn) {
     ));
   }
 
-  return _cache[fn] = FunctionData(parametersData);
+  return _cache[fn] = FunctionData(
+    parametersData,
+    (
+      fnMirror.location?.line ?? 0,
+      0,
+    ),
+    fnMirror.location?.sourceUri.toString() ?? '',
+  );
 }
 
 void loadData(Map<dynamic, FunctionData> functionData) {

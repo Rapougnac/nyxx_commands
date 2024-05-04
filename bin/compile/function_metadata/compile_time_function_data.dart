@@ -23,7 +23,13 @@ class CompileTimeFunctionData {
   /// The parameter data for this function.
   final List<CompileTimeParameterData> parametersData;
 
-  const CompileTimeFunctionData(this.id, this.parametersData);
+  /// The start and end line of this function.
+  final (int, int) lines;
+
+  /// The full path to the file that contains this function.
+  final String filePath;
+
+  const CompileTimeFunctionData(this.id, this.parametersData, this.lines, this.filePath);
 
   @override
   String toString() => 'CompileTimeFunctionData[id=$id, parameters=$parametersData]';

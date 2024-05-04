@@ -335,7 +335,9 @@ void writeFunctionData(
 
     result.write(parameterDataSource);
 
-    result.write(']),');
+    result.write('],');
+    result.write('${function.lines},');
+    result.write("'${function.filePath}',),");
   }
 
   result.write('};');

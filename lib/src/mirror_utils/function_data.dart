@@ -10,7 +10,11 @@ class FunctionData {
 
   int get requiredParameters => parametersData.takeWhile((value) => !value.isOptional).length;
 
-  const FunctionData(this.parametersData);
+  final (int, int) lines;
+
+  final String filePath;
+
+  const FunctionData(this.parametersData, this.lines, this.filePath);
 }
 
 class ParameterData<T> {

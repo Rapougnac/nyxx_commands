@@ -285,6 +285,12 @@ class ChatCommand
   /// The arguments of [execute], in the order they appear.
   final List<ParameterData<dynamic>> arguments = [];
 
+  /// The start and end line of this command.
+  late final (int, int) lines;
+
+  /// The full path to the file that contains this command.
+  late final String filePath;
+
   @override
   final CommandOptions options;
 
@@ -376,6 +382,9 @@ class ChatCommand
       argumentTypes.add(parameter.type);
       arguments.add(parameter);
     }
+
+    lines = _functionData.lines;
+    filePath = _functionData.filePath;
   }
 
   @override

@@ -12,23 +12,41 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+import 'dart:math';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/element/element.dart';
 import 'package:nyxx_commands/nyxx_commands.dart' show CommandsError;
+import 'package:dart_style/dart_style.dart';
 
 import '../generator.dart';
 import 'compile_time_function_data.dart';
 
+int getEndLine(AstNode node, LineInfo lineInfo) {
+  int endLine = lineInfo.getLocation(node.endToken.offset).lineNumber;
+
+  for (final child in node.childEntities) {
+    if (child is AstNode) {
+      endLine = max(endLine, getEndLine(child, lineInfo));
+    }
+  }
+
+  return endLine;
+}
+
 /// Convert [idCreations] into function metadata.
-Iterable<CompileTimeFunctionData> getFunctionData(
-  Iterable<InvocationExpression> ids,
-) {
+Iterable<CompileTimeFunctionData> getFunctionData(Iterable<InvocationExpression> ids) {
   List<CompileTimeFunctionData> result = [];
 
   outerLoop:
   for (final id in ids) {
+    var lineInfo = (id.root as CompilationUnit).lineInfo;
+    var parent = id.parent ?? (throw CommandsError('Id invocation has no parent'));
+    int startLine = lineInfo.getLocation(parent.beginToken.offset).lineNumber;
+    int endLine = lineInfo.getLocation(parent.endToken.offset).lineNumber;
     if (id.argumentList.arguments.length != 2) {
       logger.shout(
           'Unexpected number of arguments ${id.argumentList.arguments.length} in id invocation');
@@ -173,7 +191,16 @@ Iterable<CompileTimeFunctionData> getFunctionData(
       ));
     }
 
-    result.add(CompileTimeFunctionData(id.argumentList.arguments.first, parameterData));
+    Uri sourceUri = parent.thisOrAncestorOfType<CompilationUnit>()!.declaredElement!.source.uri;
+
+    result.add(
+      CompileTimeFunctionData(
+        id.argumentList.arguments.first,
+        parameterData,
+        (startLine, endLine),
+        sourceUri.toString(),
+      ),
+    );
   }
 
   return result;
