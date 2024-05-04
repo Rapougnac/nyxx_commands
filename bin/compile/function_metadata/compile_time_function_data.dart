@@ -63,6 +63,9 @@ class CompileTimeParameterData {
   /// The choices for this parameter.
   final Expression? choices;
 
+  /// The localized choices for this parameter.
+  final Expression? localizedChoices;
+
   /// The converter override for this parameter.
   final Annotation? converterOverride;
 
@@ -80,6 +83,7 @@ class CompileTimeParameterData {
     this.autocompleteOverride,
     this.localizedDescriptions,
     this.localizedNames,
+    this.localizedChoices,
   );
 
   @override
@@ -92,5 +96,6 @@ class CompileTimeParameterData {
       'converterOverride=$converterOverride, '
       'autocompleteOverride=$autocompleteOverride, '
       'localizedDescriptions=$localizedDescriptions, '
-      'localizedNames=$localizedNames]';
+      'localizedNames=$localizedNames, '
+      'localizedChoices=$localizedChoices]';
 }

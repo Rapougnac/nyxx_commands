@@ -77,8 +77,12 @@ FunctionData loadFunctionData(Function fn) {
     }
 
     Map<String, dynamic>? choices;
+    List<Map<Locale, String>>? choicesLocales;
     if (choicesAnnotations.isNotEmpty) {
       choices = choicesAnnotations.first.choices;
+    }
+    if (choicesAnnotations.isNotEmpty) {
+      choicesLocales = choicesAnnotations.first.nameLocalizations;
     }
 
     // Get parameter converter override
@@ -115,6 +119,7 @@ FunctionData loadFunctionData(Function fn) {
       localizedDescriptions: descriptionLocales,
       defaultValue: parameterMirror.defaultValue?.reflectee,
       choices: choices,
+      localizedChoices: choicesLocales,
       converterOverride: converterOverride,
       autocompleteOverride: autocompleteOverride,
     ));

@@ -72,6 +72,7 @@ Iterable<CompileTimeFunctionData> getFunctionData(Iterable<InvocationExpression>
         null,
         null,
         null,
+        null,
       )
     ];
 
@@ -132,6 +133,7 @@ Iterable<CompileTimeFunctionData> getFunctionData(Iterable<InvocationExpression>
       String? description;
       Expression? localizedDescriptions;
       Expression? choices;
+      Expression? localizedChoices;
       Expression? defaultValue;
       Annotation? converterOverride;
       Annotation? autocompleteOverride;
@@ -162,6 +164,12 @@ Iterable<CompileTimeFunctionData> getFunctionData(Iterable<InvocationExpression>
 
       if (choicesAnnotations.isNotEmpty) {
         choices = choicesAnnotations.first.arguments!.arguments.first;
+
+        final choicesArgs = choicesAnnotations.first.arguments!.arguments;
+
+        if (choicesArgs.length == 2) {
+          localizedChoices = choicesAnnotations.first.arguments!.arguments.last;
+        }
       }
 
       if (parameter is DefaultFormalParameter) {
@@ -187,6 +195,7 @@ Iterable<CompileTimeFunctionData> getFunctionData(Iterable<InvocationExpression>
         autocompleteOverride,
         localizedDescriptions,
         localizedNames,
+        localizedChoices,
       ));
     }
 

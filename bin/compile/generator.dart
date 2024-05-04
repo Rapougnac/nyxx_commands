@@ -232,6 +232,23 @@ void writeFunctionData(
         choicesSource = choicesData.first;
       }
 
+      String? localizedChoicesSource;
+
+      if (parameter.localizedChoices != null) {
+        List<String>? localizedChoicesData = toExpressionSource(parameter.localizedChoices!);
+
+        if (localizedChoicesData == null) {
+          logger.warning(
+            'Unable to resolve localized choices for parameter ${parameter.name}, skipping function',
+          );
+          continue outerLoop;
+        }
+
+        imports.addAll(localizedChoicesData.skip(1));
+
+        localizedChoicesSource = localizedChoicesData.first;
+      }
+
       String? autocompleteSource;
 
       if (parameter.autocompleteOverride != null) {
@@ -312,6 +329,7 @@ void writeFunctionData(
           autocompleteOverride: $autocompleteSource,
           localizedDescriptions: $localizedDescriptionsSource,
           localizedNames: $localizedNamesSource,
+          localizedChoices: $localizedChoicesSource,
         ),
       ''';
     }

@@ -34,6 +34,8 @@ class ParameterData<T> {
 
   final Map<String, dynamic>? choices;
 
+  final List<Map<Locale, String>>? localizedChoices;
+
   final Converter<dynamic>? converterOverride;
 
   final FutureOr<Iterable<CommandOptionChoiceBuilder<dynamic>>?> Function(AutocompleteContext)?
@@ -48,6 +50,7 @@ class ParameterData<T> {
     required this.localizedDescriptions,
     required this.defaultValue,
     required this.choices,
+    required this.localizedChoices,
     required this.converterOverride,
     required this.autocompleteOverride,
   });
