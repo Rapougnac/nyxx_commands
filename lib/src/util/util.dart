@@ -127,17 +127,28 @@ class Choices {
   ///
   /// You might also be interested in:
   /// - [CommandOptionChoiceBuilder], the nyxx_interactions builder these entries are converted to.
+  /// - [nameLocalizations], for setting localized names for the choices.
   final Map<String, dynamic> choices;
+
+  /// The localized names for the choices.
+  ///
+  /// The keys are the locales and the values are the localized names for the choices that will be displayed in the Discord UI.
+  final Map<Locale, String>? nameLocalizations;
 
   /// Create a new [Choices].
   ///
   /// This is intended to be used as an `@Choices(...)` annotation, and has no functionality as
   /// a standalone class.
-  const Choices(this.choices);
+  const Choices(this.choices, [this.nameLocalizations]);
 
   /// Get the builders that this [Choices] represents.
-  Iterable<CommandOptionChoiceBuilder<dynamic>> get builders => choices.entries
-      .map((entry) => CommandOptionChoiceBuilder(name: entry.key, value: entry.value));
+  Iterable<CommandOptionChoiceBuilder<dynamic>> get builders => choices.entries.map(
+        (entry) => CommandOptionChoiceBuilder(
+          name: entry.key,
+          value: entry.value,
+          nameLocalizations: nameLocalizations,
+        )
+      );
 
   @override
   String toString() => 'Choices[choices=$choices]';
