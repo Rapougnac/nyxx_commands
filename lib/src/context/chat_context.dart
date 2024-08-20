@@ -1,4 +1,3 @@
-import 'package:eval_annotation/eval_annotation.dart';
 import 'package:nyxx/nyxx.dart';
 
 import '../commands/chat_command.dart';
@@ -23,7 +22,6 @@ abstract interface class ChatContextData implements CommandContext {
 /// You might also be interested in:
 /// - [MessageChatContext], a context in which a [ChatCommand] was executed from a text message;
 /// - [InteractionChatContext], a context in which a [ChatCommand] was executed from an interaction.
-@Bind()
 abstract interface class ChatContext implements ChatContextData, CommandContext {
   /// The arguments parsed from the user input.
   ///
@@ -44,7 +42,6 @@ abstract interface class ChatContext implements ChatContextData, CommandContext 
   set arguments(List<dynamic> value);
 }
 
-@Bind()
 abstract class ChatContextBase extends ContextBase with InteractiveMixin implements ChatContext {
   @override
   late final List<dynamic> arguments;
@@ -68,7 +65,6 @@ abstract class ChatContextBase extends ContextBase with InteractiveMixin impleme
 /// You might also be interested in:
 /// - [InteractionChatContext], a context in which a [ChatCommand] was executed from an interaction;
 /// - [ChatContext], the base class for all context representing the execution of a [ChatCommand].
-@Bind()
 class MessageChatContext extends ChatContextBase with MessageRespondMixin {
   /// The message that triggered this command.
   @override
