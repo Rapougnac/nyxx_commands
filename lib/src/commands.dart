@@ -293,6 +293,25 @@ class CommandsPlugin extends NyxxPlugin<NyxxGateway> implements CommandGroup<Com
     _attachedClients.remove(client);
   }
 
+  Future<void> _syncCommand(NyxxGateway client,
+      {required final CommandRegisterable<CommandContext> command}) async {
+    final cmd = await _buildCommand(command);
+
+    if (cmd == null) {
+      return;
+    }
+
+    final (guilds, builder) = cmd;
+
+    final commandResult = guilds.isEmpty
+        ? [await client.commands.create(builder)]
+        : await guilds.map((guildId) => client.guilds[guildId!].commands.create(builder)).wait;
+
+    registeredCommands.addAll(commandResult);
+
+    logger.info('Created command "${command.name}"');
+  }
+
   Future<void> _syncCommands(NyxxGateway client) async {
     final builders = await _buildCommands();
 
@@ -305,6 +324,64 @@ class CommandsPlugin extends NyxxPlugin<NyxxGateway> implements CommandGroup<Com
     registeredCommands.addAll(commands.expand((_) => _));
 
     logger.info('Synced ${builders.values.fold(0, (p, e) => p + e.length)} commands to Discord');
+  }
+
+  Future<(Iterable<Snowflake?>, ApplicationCommandBuilder)?> _buildCommand(
+      CommandRegisterable<CommandContext> command) async {
+    final shouldRegister = command is! ChatCommandComponent ||
+        command.hasSlashCommand ||
+        (command is ChatCommand && command.resolvedOptions.type != CommandType.textOnly);
+    if (!shouldRegister) {
+      return null;
+    }
+
+    final checks = Check.all(command.checks);
+
+    final ApplicationCommandType type;
+    final String? description;
+    final Map<Locale, String>? localizedDescriptions;
+    final List<CommandOptionBuilder>? options;
+
+    switch (command) {
+      case ChatCommandComponent():
+        type = ApplicationCommandType.chatInput;
+        description = command.description;
+        localizedDescriptions = command.localizedDescriptions;
+        options = command.getOptions(this);
+      case MessageCommand():
+        type = ApplicationCommandType.message;
+        description = null;
+        localizedDescriptions = null;
+        options = null;
+      case UserCommand():
+        type = ApplicationCommandType.user;
+        description = null;
+        localizedDescriptions = null;
+        options = null;
+      case _:
+        throw CommandsError('Unknown command type ${command.runtimeType}');
+    }
+
+    final builder = ApplicationCommandBuilder(
+      type: type,
+      name: command.name,
+      nameLocalizations: command.localizedNames,
+      description: description,
+      descriptionLocalizations: localizedDescriptions,
+      options: options,
+      defaultMemberPermissions: await checks.requiredPermissions,
+      hasDmPermission: await checks.allowsDm,
+    );
+
+    final guildChecks = command.checks.whereType<GuildCheck>();
+
+    if (guildChecks.length > 1) {
+      throw CommandsError('Cannot have more than one GuildCheck per command');
+    }
+
+    final guilds = guildChecks.singleOrNull?.guildIds ?? [guild];
+
+    return (guilds, builder);
   }
 
   Future<Map<Snowflake?, List<ApplicationCommandBuilder>>> _buildCommands() async {
@@ -444,6 +521,106 @@ class CommandsPlugin extends NyxxPlugin<NyxxGateway> implements CommandGroup<Com
       return FallbackConverter(assignable);
     }
     return null;
+  }
+
+  // final Map<CommandRegisterable<CommandContext>,
+  //     (StreamSubscription<CommandContext>, StreamSubscription<CommandContext>)> _subscriptions = {};
+
+  void addCommandOnTheFly(CommandRegisterable<CommandContext> command) {
+    if (_attachedClients.isNotEmpty) {
+      scheduleMicrotask(() {
+        for (final client in _attachedClients) {
+          _syncCommand(client, command: command);
+        }
+      });
+    }
+
+    command.parent ??= this;
+
+    command.onPreCall.listen(_onPreCallController.add);
+    command.onPostCall.listen(_onPostCallController.add);
+
+    // _subscriptions[command] = (preCallSub, postCallSub);
+
+    if (command is ChatCommandComponent) {
+      if (_chatCommands.containsKey(command.name)) {
+        throw CommandRegistrationError('Command with name "${command.name}" already exists');
+      }
+
+      for (final alias in command.aliases) {
+        if (_chatCommands.containsKey(alias)) {
+          throw CommandRegistrationError('Command with alias "$alias" already exists');
+        }
+      }
+
+      _chatCommands[command.name] = command;
+      for (final alias in command.aliases) {
+        _chatCommands[alias] = command;
+      }
+
+      for (final child in command.walkCommands()) {
+        logger.info('Registered command "${child.fullName}"');
+      }
+    } else if (command is UserCommand) {
+      if (_userCommands.containsKey(command.name)) {
+        throw CommandRegistrationError('User Command with name "${command.name}" already exists');
+      }
+
+      _userCommands[command.name] = command;
+
+      logger.info('Registered User Command "${command.name}"');
+    } else if (command is MessageCommand) {
+      if (_messageCommands.containsKey(command.name)) {
+        throw CommandRegistrationError(
+            'Message Command with name "${command.name}" already exists');
+      }
+
+      _messageCommands[command.name] = command;
+
+      logger.info('Registered Message Command "${command.name}"');
+    } else {
+      logger.warning('Unknown command type "${command.runtimeType}"');
+    }
+  }
+
+  void removeCommandOnTheFly(CommandRegisterable<CommandContext> command) {
+    if (command is ChatCommandComponent) {
+      _chatCommands.remove(command.name);
+      for (final alias in command.aliases) {
+        _chatCommands.remove(alias);
+      }
+    } else if (command is UserCommand) {
+      _userCommands.remove(command.name);
+    } else if (command is MessageCommand) {
+      _messageCommands.remove(command.name);
+    }
+
+    // final (pre, post) = _subscriptions.remove(command)!;
+
+    // pre.cancel();
+    // post.cancel();
+
+    for (final client in _attachedClients) {
+      final guildChecks = command.checks.whereType<GuildCheck>();
+      final guilds = guildChecks.singleOrNull?.guildIds ?? [guild];
+
+      final applicationCommand = registeredCommands.singleWhere(
+        (cmd) =>
+            cmd.manager is GuildApplicationCommandManager &&
+            cmd.name == command.name &&
+            guilds.contains(
+              (cmd.manager as GuildApplicationCommandManager).guildId,
+            ),
+      );
+
+      for (final id in guilds) {
+        if (id == null) {
+          continue;
+        }
+
+        client.guilds[id].commands.delete(applicationCommand.id);
+      }
+    }
   }
 
   bool _scheduledSync = false;
